@@ -54,8 +54,8 @@ export class BankService {
         const elem = await this.bankRepository.findOne({ where: [{ "id": id }] });
 
         elem.balance = Number(elem.balance) + Number(amount);
-        await this.bankRepository.save(elem)
-        return 111;
+       
+        return  await this.bankRepository.save(elem);
     }
 }
 

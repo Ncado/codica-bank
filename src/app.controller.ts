@@ -10,9 +10,5 @@ export class AppController {
     return this.appService.getHello();
   }
 
-  // @Get()
-  // generateHook(@Query('email') email: string) {
-    
-  //   return this.appService.generateHook(email);
-  // }
+
 }

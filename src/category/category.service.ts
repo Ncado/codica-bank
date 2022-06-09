@@ -1,6 +1,6 @@
-import { Injectable,HttpException,HttpStatus } from '@nestjs/common';
+import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
 import { CategoryDTO } from './DTO/category.dto';
-import { Repository,Between, In } from 'typeorm';
+import { Repository, Between, In } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { CategoryModel } from './category.entity';
 import { StatisticGetDTO } from 'src/statistics/DTO/staticticGet.dto';
@@ -11,51 +11,45 @@ export class CategoryService {
         private categoryRepository: Repository<CategoryModel>
     ) { }
 
-    async getStatistic(statictic:StatisticGetDTO){
+    async getStatistic(statictic: StatisticGetDTO) {
         const users = await this.categoryRepository.find({
             where: {
                 "id": In(statictic.idCategory),
-               
+
             },
-            relations: [ "trans"] 
+            relations: ["trans"]
         })
-    //     console.log("statictic.fromPeriod-> "+ statictic.fromPeriod+ "formaed-> "+Date.parse(statictic.fromPeriod))
-    //     console.log("statictic.toPeriod-> "+ statictic.toPeriod+ "formaed-> "+Date.parse(statictic.toPeriod))
-    //    console.log(statictic.idCategory)
-     let res  = []
-   
-     for (let i = 0; i < users.length; i++) {
-        
-    res.push(...users[i].trans)
-    }
+
+        let res = []
+
+        for (let i = 0; i < users.length; i++) {
+
+            res.push(...users[i].trans)
+        }
         return res
-       }
+    }
 
 
 
     async create(category: CategoryDTO) {
-        
-        if(category.type=="consumable"||category.type=="profitable"){
+
+        if (category.type == "consumable" || category.type == "profitable") {
             return await this.categoryRepository.save(category);
         }
         throw new HttpException({
             status: HttpStatus.FORBIDDEN,
             error: 'category must have consumable or profitable type',
-          }, HttpStatus.FORBIDDEN);
+        }, HttpStatus.FORBIDDEN);
 
     }
     async getOne(id) {
-        return await this.categoryRepository.findOne({ where: [{ "id": id }],relations: [ "trans"]  });
+        return await this.categoryRepository.findOne({ where: [{ "id": id }], relations: ["trans"] });
     }
 
     async getAll() {
-      
-        const categories = await this.categoryRepository.find({relations: [ "trans"]});
-        // return await this.categoryRepository
-        // .createQueryBuilder('category')
-        // .leftJoinAndSelect("category.trans", "trans")
-        // .getMany();
 
+        const categories = await this.categoryRepository.find({ relations: ["trans"] });
+   
         return categories
     }
 
@@ -65,23 +59,23 @@ export class CategoryService {
         if (category.name) {
             elem.name = category.name;
         }
-        if (category.type=="consumable"||category.type=="profitable") {
+        if (category.type == "consumable" || category.type == "profitable") {
             elem.type = category.type;
-        }else{
+        } else {
             throw new HttpException({
                 status: HttpStatus.FORBIDDEN,
                 error: 'category must have consumable or profitable type',
-              }, HttpStatus.FORBIDDEN);
+            }, HttpStatus.FORBIDDEN);
         }
         return await this.categoryRepository.save(elem)
 
     }
 
-    async deleteCategory(id:number){
-        const category = await this.categoryRepository.findOne({ where: [{ "id": id }],relations: [ "trans"] });
-        if(category?.trans.length){
+    async deleteCategory(id: number) {
+        const category = await this.categoryRepository.findOne({ where: [{ "id": id }], relations: ["trans"] });
+        if (category?.trans.length) {
             return await this.categoryRepository.delete(category.id);
-        }    
+        }
 
     }
 }
